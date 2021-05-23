@@ -1,0 +1,1 @@
+python bot.py xoxb-1087542667734-1316920179953-G4dFKUgvLcziI8rGoTnadnCk
