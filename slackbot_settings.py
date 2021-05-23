@@ -1,5 +1,5 @@
 import os
-token = os.environ["BOT_API_TOKEN"]
+API_TOKEN = os.environ["BOT_API_TOKEN"]
 
 DEFULT_REPLY = "not known word"
 
