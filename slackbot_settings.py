@@ -1,6 +1,5 @@
-#API_TOKEN = open("./apitoken.txt").read()
-import sys
-API_TOKEN = sys.argv[1]
+import os
+token = os.environ["BOT_API_TOKEN"]
 
 DEFULT_REPLY = "not known word"
 
