@@ -6,6 +6,10 @@ import os
 
 @respond_to('build (.*)')
 def input_contest(message,something):
+    channel_id = message.body["channel"]
+    if os.path.exists(f'all_contest_{channel_id}.json') or os.path.exists(f'contest_{channel_id}.json'):
+        message.reply("既にコンテスト予定が立っています。参加する人は引き続きIDをメンションで送ってください。")
+        return
     contestAPI = requests.get('http://codeforces.com/api/contest.list?gym=false')
     contestAPI = contestAPI.json()
     if contestAPI['status'] == 'FAILED' :
@@ -47,9 +51,9 @@ def input_contest(message,something):
         message.reply('入力されたDivには対応していません')
         message.reply('対応例: Div1 Div2 Div3')
         return
-    with open('all_contest.json', 'w') as ac:
+    with open(f'all_contest_{channel_id}.json', 'w') as ac:
         json.dump(all_contest, ac, indent=4)
-    with open('contest.json', 'w') as c:
+    with open(f'contest_{channel_id}.json', 'w') as c:
         json.dump(contest, c, indent=4)
 
     message.send('参加する人はIDをメンションで送ってください')
@@ -57,9 +61,10 @@ def input_contest(message,something):
 
 @respond_to('erase')
 def delete_contest(message):
+    channel_id = message.body["channel"]
     try:
-        os.remove('contest.json')
-        os.remove('all_contest.json')
+        os.remove(f'contest_{channel_id}.json')
+        os.remove(f'all_contest_{channel_id}.json')
     except:
         message.reply('バチャが立っていません')
     else:
@@ -67,6 +72,11 @@ def delete_contest(message):
 
 @respond_to('id (.*)')
 def test_id(message,something):
+    channel_id = message.body["channel"]
+    if os.path.exists(f'all_contest_{channel_id}.json') or os.path.exists(f'contest_{channel_id}.json'):
+        message.reply("先にバチャを立ててください")
+        return
+    
     req_user = requests.get('http://codeforces.com/api/user.status?handle='+something+'&from=1')
     data_user = req_user.json()
     if data_user['status'] == 'FAILED' :
@@ -77,15 +87,12 @@ def test_id(message,something):
     all_contest = {}
     contest = {}
 
-    try:
-        with open('all_contest.json') as ac:
-            all_contest = json.load(ac)
-        with open('contest.json') as c:
-            contest = json.load(c)
-    except:
-        message.reply('先にバチャを立ててください')
-    else:
-        message.reply('IDを受け付けました')
+    with open(f'all_contest_{channel_id}.json') as ac:
+        all_contest = json.load(ac)
+    with open(f'contest_{channel_id}.json') as c:
+        contest = json.load(c)
+    
+    message.reply('IDを受け付けました')
 
     for x in data_user:
         check = str(x['contestId'])
@@ -97,15 +104,16 @@ def test_id(message,something):
                     del contest[check]
                     # id_lists.remove(check)
 
-    with open('contest.json', 'w') as c:
+    with open(f'contest_{channel_id}.json', 'w') as c:
         json.dump(contest, c, indent=4)
 
     
 @respond_to('run')
 def test_recommendation(message):
+    channel_id = message.body["channel"]
     cnt = 0
     try:
-        with open('contest.json') as c:
+        with open(f'contest_{channel_id}.json') as c:
             contest = json.load(c)
     except:
         message.reply('先にバチャを立ててください')
@@ -119,5 +127,5 @@ def test_recommendation(message):
         if cnt == 1:
             break
 
-    os.remove('contest.json')
-    os.remove('all_contest.json')
+    os.remove(f'contest_{channel_id}.json')
+    os.remove(f'all_contest_{channel_id}.json')
