@@ -73,7 +73,7 @@ def delete_contest(message):
 @respond_to('id (.*)')
 def test_id(message,something):
     channel_id = message.body["channel"]
-    if os.path.exists(f'all_contest_{channel_id}.json') or os.path.exists(f'contest_{channel_id}.json'):
+    if not os.path.exists(f'all_contest_{channel_id}.json') or not os.path.exists(f'contest_{channel_id}.json'):
         message.reply("先にバチャを立ててください")
         return
     
